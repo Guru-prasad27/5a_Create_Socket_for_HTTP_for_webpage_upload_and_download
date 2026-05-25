@@ -16,6 +16,88 @@ To write a PYTHON program for socket for HTTP for web page upload and download
 6.Stop the program
 <BR>
 ## Program 
+# server.py
+```
+import socket
+
+s = socket.socket()
+s.bind(("localhost",1024))
+s.listen(1)
+
+print("Server running...")
+
+while True:
+    c,addr = s.accept()
+    
+    request = c.recv(1024).decode()
+    print("Request received")
+
+    if "GET" in request:
+        f = open("index.html","r")
+        data = f.read()
+        f.close()
+
+        response = "HTTP/1.1 200 OK\n\n" + data
+        c.send(response.encode())
+
+    elif "POST" in request:
+        data = request.split("\n\n")[1]
+
+        f = open("upload.txt","w")
+        f.write(data)
+        f.close()
+
+        c.send("HTTP/1.1 200 OK\n\nFile Uploaded".encode())
+
+    c.close()
+
+
+```
+# client.py
+```
+import socket
+
+s = socket.socket()
+s.connect(("localhost",1024))
+
+ch = input("1.Download 2.Upload : ")
+
+if ch == "1":
+    req = "GET / HTTP/1.1\nHost: localhost\n\n"
+    s.send(req.encode())
+
+    data = s.recv(4096)
+    print(data.decode())
+
+else:
+    msg = input("Enter data to upload: ")
+
+    req = "POST / HTTP/1.1\nHost: localhost\n\n" + msg
+    s.send(req.encode())
+
+    data = s.recv(1024)
+    print(data.decode())
+
+s.close()
+
+```
+# index.html
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>hello world</p>
+</body>
+</html>
+```
 ## OUTPUT
+<img width="1048" height="392" alt="image" src="https://github.com/user-attachments/assets/fb1b6e3f-e79e-48dd-9b49-5925e8fd5d3d" />
+<img width="1020" height="927" alt="image" src="https://github.com/user-attachments/assets/e10e982f-599f-44fe-b493-b97d836884b5" />
+
 ## Result
 Thus the socket for HTTP for web page upload and download created and Executed
